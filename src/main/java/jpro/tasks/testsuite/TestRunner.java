@@ -65,35 +65,35 @@ public class TestRunner {
                         .build();
             }
 
-
             runPrepMeths(testClassInstance, beforeEach);
-            try {
-                test.invoke(testClassInstance, (Object[]) null);
-                runPrepMeths(testClassInstance, afterEach);
+            var testResult = runTestMethod(testClassInstance, test);
+            runPrepMeths(testClassInstance, afterEach);
+            return testResult;
+        };
+    }
+
+    private static TestInfo runTestMethod(final Object testClassInstance, final Method test) {
+        try {
+            test.invoke(testClassInstance, (Object[]) null);
+            return TestInfo.builder()
+                    .testName(test.getName())
+                    .testResult(TestResult.SUCCESS)
+                    .build();
+        } catch (IllegalAccessException | InvocationTargetException | BadTestClassError e) {
+            if (e.getCause() instanceof TestAssertionError ex) {
                 return TestInfo.builder()
                         .testName(test.getName())
-                        .testResult(TestResult.SUCCESS)
+                        .testResult(TestResult.FAILED)
+                        .failureReason(ex)
                         .build();
-            } catch (IllegalAccessException e) {
-                runPrepMeths(testClassInstance, afterEach);
-                throw new BadTestClassError(e.getMessage());
-            } catch (InvocationTargetException | BadTestClassError e) {
-                runPrepMeths(testClassInstance, afterEach);
-                if (e.getCause() instanceof TestAssertionError ex) {
-                    return TestInfo.builder()
-                            .testName(test.getName())
-                            .testResult(TestResult.FAILED)
-                            .failureReason(ex)
-                            .build();
-                } else {
-                    return TestInfo.builder()
-                            .testName(test.getName())
-                            .testResult(TestResult.ERROR)
-                            .failureReason(e.getCause())
-                            .build();
-                }
+            } else {
+                return TestInfo.builder()
+                        .testName(test.getName())
+                        .testResult(TestResult.ERROR)
+                        .failureReason(e)
+                        .build();
             }
-        };
+        }
     }
 
     private static void runPrepMeths(final Object instance, List<Method> beforeSuite) {
