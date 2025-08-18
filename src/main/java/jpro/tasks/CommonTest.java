@@ -29,17 +29,17 @@ public class CommonTest {
         log.info("After Each");
     }
 
-    @Test
+    @Test("Simple Test Renamed")
     @Order(7)
     void simpleTest() {
         log.info("Third test");
         assertEquals(1, 1);
     }
 
-    @Test
+    @Test(order = 999)
     void erroredTest() {
         log.info("Last test");
-        throw new RuntimeException("This test fails");
+        throw new RuntimeException("This test fails with error");
     }
 
     @Test
