@@ -71,19 +71,17 @@ public class TestRunner {
     }
 
     private static <T> Map<TestResult, List<TestInfo>> runMethods(Class<T> clazz, final Map<TestMethodType, List<Method>> preparedMethods) {
-        final Object testClassInstance = getTestClassInstance(clazz);
-
         final var beforeSuite = preparedMethods.getOrDefault(BEFORE_SUITE, new ArrayList<>());
         final var afterSuite = preparedMethods.getOrDefault(AFTER_SUITE, new ArrayList<>());
         final var beforeEach = preparedMethods.getOrDefault(BEFORE_EACH, new ArrayList<>());
         final var afterEach = preparedMethods.getOrDefault(AFTER_EACH, new ArrayList<>());
 
-        runPrepMeths(testClassInstance, beforeSuite);
+        runPrepMeths(null, beforeSuite);
         final var result = preparedMethods.getOrDefault(TestMethodType.TEST, new ArrayList<>()).stream()
                 .sorted(compareByOrder().thenComparing(compareByName()))
                 .map(runTestMethod(clazz, beforeEach, afterEach))
                 .collect(Collectors.groupingBy(TestInfo::testResult));
-        runPrepMeths(testClassInstance, afterSuite);
+        runPrepMeths(null, afterSuite);
         return result;
     }
 
