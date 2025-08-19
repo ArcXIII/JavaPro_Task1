@@ -81,13 +81,13 @@ public class TestRunner {
         runPrepMeths(testClassInstance, beforeSuite);
         final var result = preparedMethods.getOrDefault(TestMethodType.TEST, new ArrayList<>()).stream()
                 .sorted(compareByOrder().thenComparing(compareByName()))
-                .map(runTestMethod(testClassInstance, beforeEach, afterEach))
+                .map(runTestMethod(clazz, beforeEach, afterEach))
                 .collect(Collectors.groupingBy(TestInfo::testResult));
         runPrepMeths(testClassInstance, afterSuite);
         return result;
     }
 
-    private static Function<Method, TestInfo> runTestMethod(final Object testClassInstance, final List<Method> beforeEach, final List<Method> afterEach) {
+    private static <T> Function<Method, TestInfo> runTestMethod(Class<T> testClass, final List<Method> beforeEach, final List<Method> afterEach) {
         return test -> {
             if (TestMethodUtils.isDisabled(test)) {
                 return TestInfo.builder()
@@ -95,7 +95,7 @@ public class TestRunner {
                         .testResult(TestResult.SKIPPED)
                         .build();
             }
-
+            final Object testClassInstance = getTestClassInstance(testClass);
             runPrepMeths(testClassInstance, beforeEach);
             var testResult = runTestMethod(testClassInstance, test);
             runPrepMeths(testClassInstance, afterEach);
