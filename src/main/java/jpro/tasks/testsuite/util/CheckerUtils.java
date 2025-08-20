@@ -23,7 +23,7 @@ public class CheckerUtils {
         if (Modifier.isStatic(meth.getModifiers()))
             return;
 
-        throw new BadTestClassError(format("%s should be static!", meth.getName()));
+        throw new BadTestClassError(format("Method %s should be static!", meth.getName()));
     }
 
     public static void checkDisabled(final Method meth) {
