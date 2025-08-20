@@ -2,7 +2,6 @@ package jpro.tasks.testsuite;
 
 import jpro.tasks.testsuite.exception.BadTestClassError;
 import jpro.tasks.testsuite.exception.TestAssertionError;
-import jpro.tasks.testsuite.util.MapUtils;
 import jpro.tasks.testsuite.util.TestMethodUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -43,23 +42,23 @@ public class TestRunner {
                 switch (anno.annotationType().getSimpleName()) {
                     case "AfterEach" -> {
                         checkNotStatic(meth);
-                        MapUtils.putOrAdd(result, AFTER_EACH, meth);
+                        result.computeIfAbsent(AFTER_EACH, k -> new ArrayList<>()).add(meth);
                     }
                     case "BeforeEach" -> {
                         checkNotStatic(meth);
-                        MapUtils.putOrAdd(result, BEFORE_EACH, meth);
+                        result.computeIfAbsent(BEFORE_EACH, k -> new ArrayList<>()).add(meth);
                     }
                     case "Test" -> {
                         checkNotStatic(meth);
-                        MapUtils.putOrAdd(result, TestMethodType.TEST, meth);
+                        result.computeIfAbsent(TEST, k -> new ArrayList<>()).add(meth);
                     }
                     case "AfterSuite" -> {
                         checkIsStatic(meth);
-                        MapUtils.putOrAdd(result, AFTER_SUITE, meth);
+                        result.computeIfAbsent(AFTER_SUITE, k -> new ArrayList<>()).add(meth);
                     }
                     case "BeforeSuite" -> {
                         checkIsStatic(meth);
-                        MapUtils.putOrAdd(result, BEFORE_SUITE, meth);
+                        result.computeIfAbsent(BEFORE_SUITE, k -> new ArrayList<>()).add(meth);
                     }
                     case "Disabled" -> checkDisabled(meth);
                     case "Order" -> { /*doNothing*/ }
